@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>داشبورد چت‌بات</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>💬 چت‌بات داشبورد</h2>
+  <div id="chatbot">
+    <div id="messages"></div>
+    <input id="chatInput" type="text" placeholder="پیام خود را تایپ کنید..." />
+  </div>
+
+  <script>
+    const apiURL = "/api/ai";
+
+    async function askAI(text){
+      const res = await fetch(apiURL, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ message: text })
+      });
+      const json = await res.json();
+      return json?.candidates?.[0]?.content?.parts?.[0]?.text || "پاسخی یافت نشد";
+    }
+
+    document.getElementById("chatInput").addEventListener("keypress", async (e)=>{
+      if(e.key === "Enter"){
+        const box = document.getElementById("messages");
+        const msg = e.target.value;
+        e.target.value = "";
+        box.innerHTML += `<div><b>شما:</b> ${msg}</div>`;
+        const reply = await askAI(msg);
+        box.innerHTML += `<div style="color:blue;"><b>💬 هوش مصنوعی:</b> ${reply}</div>`;
+        box.scrollTop = box.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>
